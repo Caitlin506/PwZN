@@ -1,6 +1,5 @@
 import numpy as np
-import rich
-import tqdm
+from rich.progress import track
 from PIL import Image,ImageDraw
 
 n=50
@@ -68,7 +67,7 @@ class Simulation:
         images = []
         self.initialize()
         images.append(self.draw_state(0))
-        for i in tqdm.tqdm(range(steps)):
+        for i in track(range(steps),description="Processing..."):
             self.update()
             images.append(self.draw_state(i+1))
         my_name = file_name+'.gif'
