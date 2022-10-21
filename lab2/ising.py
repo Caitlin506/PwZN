@@ -1,13 +1,23 @@
 import numpy as np
 from rich.progress import track
 from PIL import Image,ImageDraw
+import argparse
 
-n=50
-prob=1-0.5
-J=1
-beta=1
-B=1
-steps=10
+parser = argparse.ArgumentParser()
+parser.add_argument("n",type=int,help="Creates a nxn size lattice")
+parser.add_argument("J",type=float,help="Interaction: J>0 ferromagnetic, J<0 antiferromagnetic, J=0 noninteracting")
+parser.add_argument("beta",type=float,help="Parameter")
+parser.add_argument("B",type=float,help="External magnetic field")
+parser.add_argument("steps",type=int,help="Number of steps in the simulation")
+parser.add_argument('-p','--positive', type=float, default=0.5, help='Percentage of positive spins, default=0.5')
+args = parser.parse_args()
+n=args.n
+J=args.J
+beta=args.beta
+B=args.B
+steps=args.steps
+prob=1-args.positive
+
 file_name='step'
 
 class Simulation:
@@ -18,6 +28,14 @@ class Simulation:
             for j in range(n):
                 if np.random.rand()<prob:
                     self.current_state[i][j]=-1
+    def magnetization(self,iter):
+        spinsum = 0
+        for i in range(n):
+            for j in range(n):
+                spinsum+=self.current_state[i][j]
+        magn = 1/(n*n)*spinsum
+        print(magn,iter)
+        return magn
     def hamiltonian(self):
         sum1 = 0
         sum2 = 0
@@ -67,12 +85,13 @@ class Simulation:
         images = []
         self.initialize()
         images.append(self.draw_state(0))
+        self.magnetization(0)
         for i in track(range(steps),description="Processing..."):
             self.update()
             images.append(self.draw_state(i+1))
+            self.magnetization(i+1)
         my_name = file_name+'.gif'
         images[0].save(my_name, save_all=True, append_images=images[1:], optimize=False, duration=20*steps, loop=0)
         
 s1=Simulation()
 s1.simulate()
-
