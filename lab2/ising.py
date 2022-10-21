@@ -10,6 +10,9 @@ parser.add_argument("beta",type=float,help="Parameter")
 parser.add_argument("B",type=float,help="External magnetic field")
 parser.add_argument("steps",type=int,help="Number of steps in the simulation")
 parser.add_argument('-p','--positive', type=float, default=0.5, help='Percentage of positive spins, default=0.5')
+parser.add_argument('-a', '--animation', help="Creates a gif and saves it under the provided name")
+parser.add_argument('-s', '--save_pictures', help="Creates a picture for every step and saves them under the provided name")
+parser.add_argument('-m', '--magnetization', help="Creates file with magnetization valued and saves it under the provided name")
 args = parser.parse_args()
 n=args.n
 J=args.J
@@ -34,8 +37,7 @@ class Simulation:
             for j in range(n):
                 spinsum+=self.current_state[i][j]
         magn = 1/(n*n)*spinsum
-        print(magn,iter)
-        return magn
+        return magn,iter
     def hamiltonian(self):
         sum1 = 0
         sum2 = 0
@@ -78,20 +80,27 @@ class Simulation:
                     draw.rectangle((i*10,j*10,i*10+10,j*10+10),(204, 255, 168))
                 else:
                     draw.rectangle((i*10,j*10,i*10+10,j*10+10),(96, 61, 145))
-        my_name = file_name+str(iter)+'.png'
-        img.save(my_name)
+        if(args.save_pictures):
+            my_name = args.save_pictures+str(iter)+'.png'
+            img.save(my_name)
         return img
     def simulate(self):
         images = []
+        magnet = []
         self.initialize()
         images.append(self.draw_state(0))
-        self.magnetization(0)
+        magnet.append(self.magnetization(0))
         for i in track(range(steps),description="Processing..."):
             self.update()
             images.append(self.draw_state(i+1))
-            self.magnetization(i+1)
-        my_name = file_name+'.gif'
-        images[0].save(my_name, save_all=True, append_images=images[1:], optimize=False, duration=20*steps, loop=0)
+            magnet.append(self.magnetization(i+1))
+        if(args.animation):
+            images[0].save(args.animation+'.gif', save_all=True, append_images=images[1:], optimize=False, duration=20*steps, loop=0)
+        if (args.magnetization):
+            with open(args.magnetization+'.txt', 'w') as f:
+                f.write('n \t magnetization \n')
+                for m in magnet:
+                    f.write(str(m[1])+'\t'+str(m[0])+'\n')
         
 s1=Simulation()
 s1.simulate()
