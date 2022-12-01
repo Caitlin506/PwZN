@@ -1,0 +1,2 @@
+without numba: 472,09 (n=50)
+with numba: 8,86 (n=100) 1,64 (n=50)
