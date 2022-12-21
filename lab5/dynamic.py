@@ -23,11 +23,13 @@ options.add_argument('--disable-notifications')
 service = Service('chromedriver_linux64/chromedriver')
 driver = webdriver.Chrome(service = service, options = options)
 driver.get('https://www.goodreads.com/book/popular_by_date/2022/11?ref=nav_brws_newrels')
-for i in range(1):
+for i in range(2):
     driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
     time.sleep(1)
     button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#__next > div > main > div.PopularByDatePage__content > div.PopularByDatePage__listContainer > div.PopularByDatePage__paginationSelector > div > div > button')))
     button.click()
+    time.sleep(5)
+    driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
     
 books = []
 
