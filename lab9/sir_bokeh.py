@@ -35,7 +35,6 @@ fig.line("t",  "R", color = 'orchid', line_width = 3, source=source, legend_labe
 fig.title.text = "SIR"
 fig.title.align = "center"
 fig.toolbar.autohide = True
-fig.border_fill_color = "thistle"
 fig.background_fill_color = "whitesmoke"
 
 def updateBeta(attr,old,new):
